@@ -4,15 +4,18 @@ using System.Collections.Generic;
 public class FishTank : MonoBehaviour
 {
     public FishAgent fishPrefab;
-    public int fishCount = 50;
+    [SerializeField] Transform visualTank;
+    public int fishCount = 20;
 
-    public Vector3 tankSize = new Vector3(20, 10, 10);
+    //public Vector3 tankSize = new Vector3(20, 10, 10);
+    //public Vector3 tankSize => transform.localScale;
+    public Vector3 tankSize => visualTank.localScale;
 
     public List<FishAgent> Fish { get; private set; }
         = new List<FishAgent>();
 
     void Start()
-    {
+    {        
         for (int i = 0; i < fishCount; i++)
         {
             FishAgent fish = Instantiate(fishPrefab, transform);

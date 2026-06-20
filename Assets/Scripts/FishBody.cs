@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public class Fish : MonoBehaviour
+public class FishBody : MonoBehaviour
 {
     private Transform[] segments;
+    private float minSpeed = 0f;
+    private float maxSpeed = 10f;
+    private Vector3[] basePositions;
     [SerializeField] [Range(0f, 10f)] private float speed;
 
-
-    // public float amplitude = 0.2f;
-    // public float frequency = 2f;
     [SerializeField] private  float minFrequency = 2f;
     [SerializeField] private float maxFrequency = 30f;
 
@@ -15,10 +15,7 @@ public class Fish : MonoBehaviour
     [SerializeField] private  float minAmplitude = 0.1f;
     [SerializeField] private  float phaseOffset = 0.6f;
 
-    private float maxSpeed = 10f;
-    private float minSpeed = 10f;
-
-    Vector3[] basePositions;
+    
     void Awake()
     {
         segments = new Transform[transform.childCount];
