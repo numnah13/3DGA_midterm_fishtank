@@ -2,11 +2,14 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// SOURCE: https://www.youtube.com/watch?v=2IhzPTS4av4
+
 public class PickupDrop : MonoBehaviour
 {
     [SerializeField] private Transform playerCam;
     [SerializeField] private Transform objectGrabPoint;
     [SerializeField] private LayerMask pickupLayer;
+    [SerializeField] float rotateSpeed = 100f;
 
     private ObjectGrabbable grabbable;
 
@@ -20,27 +23,18 @@ public class PickupDrop : MonoBehaviour
             {
                 float pickUpDistance = 2f;
                 if (Physics.Raycast(
-                    playerCam.position, 
+                    playerCam.position,
                     playerCam.forward,
                     out RaycastHit hit,
                     pickUpDistance,
                     pickupLayer
                 ))
                 {
-                    Debug.Log("Hit");
                     if (hit.transform.TryGetComponent<ObjectGrabbable>(out var grab))
                     {
-                        Debug.Log("grab: " + grab);
                         grabbable = grab;
                         grabbable.Grab(objectGrabPoint);
                     }
-                    // ObjectGrabbable grab = hit.transform.GetComponentInParent<ObjectGrabbable>();
-                    // Debug.Log("grab: " + grab);
-                    // if (grab != null)
-                    // {
-                    //     grabbable = grab;
-                    //     grabbable.Grab(objectGrabPoint);
-                    // }
                 }
             }
             else
@@ -48,6 +42,17 @@ public class PickupDrop : MonoBehaviour
                 grabbable.Drop();
                 grabbable = null;
             }
+        }
+
+        if (grabbable != null)
+        {
+            float scroll = Mouse.current.scroll.y.ReadValue();
+
+            grabbable.transform.Rotate(
+                Vector3.up,
+                scroll * rotateSpeed * Time.deltaTime,
+                Space.World
+            );
         }
     }
 }
