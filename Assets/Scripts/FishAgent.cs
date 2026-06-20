@@ -12,19 +12,21 @@ public class FishAgent : MonoBehaviour
     Vector3 debugWanderPoint;
     Vector3 debugTarget;
 
-    public float maxSpeed = 4f;
+    [SerializeField] private bool drawGizmos = false;
+
+    public float maxSpeed = 1f;
     public float maxForce = 2f;
 
-    public float neighborRadius = 3f;
+    public float neighborRadius = 0.2f;
 
     public float separationWeight = 2f;
     public float alignmentWeight = 1f;
-    public float cohesionWeight = 1f;
-    public float wanderWeight = 0.5f;
+    public float cohesionWeight = 2f;
+    public float wanderWeight = 0.5f;  // 1, 0.5
 
     float wanderAngle;
-    [SerializeField] float wanderRadius = 1.5f;
-    [SerializeField] float wanderDistance = 2f;
+    [SerializeField] float wanderRadius = 0.3f;
+    [SerializeField] float wanderDistance = 0.5f;
     [SerializeField] float wanderJitter = 30f;
 
     void Start()
@@ -364,6 +366,9 @@ public class FishAgent : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        if (!drawGizmos)
+            return;
+        
         if (localVelocity.sqrMagnitude < 0.001f)
             return;
 
