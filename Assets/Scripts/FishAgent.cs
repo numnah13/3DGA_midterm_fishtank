@@ -1,12 +1,11 @@
 using UnityEngine;
-//using System.Collections.Generic;
 
 public class FishAgent : MonoBehaviour
 {
     FishTank tank;
 
     Vector3 localPosition;
-    Vector3 localVelocity;
+    Vector3 localVelocity; 
     FishBody fishBody;
     float wanderAngle;
     Vector3 currentUp = Vector3.up;
@@ -15,28 +14,35 @@ public class FishAgent : MonoBehaviour
     Vector3 debugWanderPoint;
     Vector3 debugTarget;
 
-    // [Header("Fish up vector")]
-    // [SerializeField] Transform upReference;
+    [Header("Tank")]
+    [SerializeField] float wallBuffer = 0.2f;
 
     [Header("Movement")]
-    public float maxSpeed = 1f;
-    public float maxForce = 2f;
+    [SerializeField] float maxTurnForce = 8f;  // clamps how sharply heading can change per step
+
+    [Header("Speed")]
+    [SerializeField] float minSpeed = 0.05f;
+    [SerializeField] float maxSpeed = 0.5f;
+    [SerializeField] float speedJitter = 8f;     // how fast personal speed wanders per second
+    [SerializeField] float speedMatchRate = 1.5f;  // how strongly neighbors pull speed toward their average
+
+    float currentSpeed;       // this fish's actual moving speed, unit/sec
+    float personalSpeedGoal;  // where this fish wants to be absent any flock influence
 
     [Header("Perception")]
-    public float neighborRadius = 0.2f;
+    [SerializeField] float neighborRadius = 0.2f;
 
     [Header("Behavior weights")]
-    public float separationWeight = 2.5f;
-    public float alignmentWeight = 1f;
-    public float cohesionWeight = 2.5f;
-    public float wanderWeight = 0.5f;  // 0.5
+    [SerializeField] float separationWeight = 4f; //2.1f;
+    [SerializeField] float alignmentWeight = 3f; //0.8f;
+    [SerializeField] float cohesionWeight = 4f; //2f;
+    [SerializeField] float wanderWeight = 1f; //0.5f;
 
-    
     [Header("Wander")]
     [SerializeField] bool drawGizmos = false;
     [SerializeField] float wanderRadius = 0.3f;
-    [SerializeField] float wanderDistance = 0.5f;
-    [SerializeField] float wanderJitter = 30f;
+    [SerializeField] float wanderDistance = 0.1f;
+    [SerializeField] float wanderJitter = 10f;
 
     void Awake()
     {
@@ -49,9 +55,11 @@ public class FishAgent : MonoBehaviour
 
         localPosition = localPos;
 
-        localVelocity =
-            Random.onUnitSphere *
-            Random.Range(1f, maxSpeed);
+        // Velocity is purely a direction, magnitude always 1
+        localVelocity = Random.onUnitSphere;
+
+        personalSpeedGoal = Random.Range(minSpeed, maxSpeed);
+        currentSpeed = personalSpeedGoal;
 
         transform.localPosition = localPosition;
     }
@@ -62,61 +70,87 @@ public class FishAgent : MonoBehaviour
 
         Vector3 steering = Vector3.zero;
 
-        steering += Separation() * separationWeight;
-        steering += Alignment() * alignmentWeight;
-        steering += Cohesion() * cohesionWeight;
-        steering += Wander() * wanderWeight;
+        Vector3 separation = Separation();
+        Vector3 alignment = Alignment();
+        Vector3 cohesion = Cohesion();
+        Vector3 wander = Wander();
 
-        steering = Vector3.ClampMagnitude(
-            steering,
-            maxForce
-        );
+        steering += separation * separationWeight;
+        steering += alignment * alignmentWeight;
+        steering += cohesion * cohesionWeight;
+        steering += wander * wanderWeight;
 
+        // Clamp how strongly heading can be pushed this frame
+        steering = Vector3.ClampMagnitude(steering, maxTurnForce);
+
+        // Steering only ever changes direction, never magnitude
         localVelocity += steering * dt;
-        localVelocity = Vector3.ClampMagnitude(
-            localVelocity,
-            maxSpeed
-        );
+        localVelocity = localVelocity.sqrMagnitude > 0.0001f
+            ? localVelocity.normalized
+            : transform.localRotation * Vector3.forward;
 
-        float currentSpeed = localVelocity.magnitude;
-        fishBody.speed = currentSpeed;
-
-        localPosition += localVelocity * dt;
+        // Move at a speed that drifts on its own but is pulled toward
+        // the flock's average speed when neighbors are nearby
+        UpdateSpeed(dt);
+        localPosition += localVelocity * currentSpeed * dt;
 
         ContainInsideTank();
 
         transform.localPosition = localPosition;
 
-        // if (localVelocity.sqrMagnitude > 0.001f)
-        // {
-        //     transform.rotation = Quaternion.LookRotation(
-        //                 tank.transform.TransformDirection(
-        //                     localVelocity.normalized
-        //                 ));
-        // }
-
         // Prevent spinning
         Vector3 worldVelocity =
-            tank.transform.TransformDirection(
-                localVelocity.normalized
-            );
+            tank.transform.TransformDirection(localVelocity);
 
         Vector3 right = Vector3.Cross(currentUp, worldVelocity);
-
         currentUp = Vector3.Cross(worldVelocity, right).normalized;
 
         transform.rotation = Quaternion.LookRotation(
             worldVelocity,
             currentUp
         );
+    }
+
+    void UpdateSpeed(float dt)
+    {
+
+        personalSpeedGoal += Random.Range(-speedJitter, speedJitter) * dt;
+        personalSpeedGoal = Mathf.Clamp(personalSpeedGoal, minSpeed, maxSpeed);
+
+        float neighborSpeedSum = 0f;
+        int neighborCount = 0;
+
+        foreach (var other in tank.Fish)
+        {
+            if (other == this)
+                continue;
+
+            float dist = Vector3.Distance(localPosition, other.localPosition);
+
+            if (dist < neighborRadius)
+            {
+                neighborSpeedSum += other.currentSpeed;
+                neighborCount++;
+            }
+        }
+
+        float targetSpeed = personalSpeedGoal;
+
+        if (neighborCount > 0)
+        {
+            float neighborAvgSpeed = neighborSpeedSum / neighborCount;
+            targetSpeed = Mathf.Lerp(personalSpeedGoal, neighborAvgSpeed, 0.6f);
+        }
 
 
-        // Current turn
-        Vector3 desired = steering.normalized;
-        Vector3 localDesired = transform.InverseTransformDirection(
-            tank.transform.TransformDirection(desired)
+        currentSpeed = Mathf.MoveTowards(
+            currentSpeed,
+            targetSpeed,
+            speedMatchRate * dt
         );
 
+        currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed);
+        Debug.Log("currentSpeed: " + currentSpeed);
     }
 
 
@@ -127,34 +161,34 @@ public class FishAgent : MonoBehaviour
         Vector3 target = localPosition;
         bool outside = false;
 
-        if (localPosition.x > half.x)
+        if (localPosition.x > half.x - wallBuffer)
         {
             target.x = half.x - 1f;
             outside = true;
         }
-        else if (localPosition.x < -half.x)
+        else if (localPosition.x < -half.x + wallBuffer)
         {
             target.x = -half.x + 1f;
             outside = true;
         }
 
-        if (localPosition.y > half.y)
+        if (localPosition.y > half.y) // no buffer, allow jumping out of water
         {
             target.y = half.y - 1f;
             outside = true;
         }
-        else if (localPosition.y < -half.y)
+        else if (localPosition.y < -half.y + wallBuffer)
         {
             target.y = -half.y + 1f;
             outside = true;
         }
 
-        if (localPosition.z > half.z)
+        if (localPosition.z > half.z - wallBuffer)
         {
             target.z = half.z - 1f;
             outside = true;
         }
-        else if (localPosition.z < -half.z)
+        else if (localPosition.z < -half.z + wallBuffer)
         {
             target.z = -half.z + 1f;
             outside = true;
@@ -162,8 +196,8 @@ public class FishAgent : MonoBehaviour
 
         if (outside)
         {
-            localVelocity +=
-                Seek(target) * Time.deltaTime * 5f;
+            localVelocity += Seek(target) * Time.deltaTime * 5f;
+            localVelocity = localVelocity.normalized;
         }
     }
 
@@ -178,17 +212,12 @@ public class FishAgent : MonoBehaviour
                 continue;
 
             float dist =
-                Vector3.Distance(
-                    localPosition,
-                    other.localPosition
-                );
+                Vector3.Distance(localPosition, other.localPosition);
 
-            if (dist < neighborRadius &&
-                dist > 0.001f)
+            if (dist < neighborRadius && dist > 0.001f)
             {
                 force +=
-                    (localPosition -
-                     other.localPosition).normalized
+                    (localPosition - other.localPosition).normalized
                     / dist;
 
                 count++;
@@ -198,7 +227,7 @@ public class FishAgent : MonoBehaviour
         if (count > 0)
             force /= count;
 
-        return SeekVelocity(force.normalized * maxSpeed);
+        return SeekDirection(force.normalized);
     }
 
     Vector3 Alignment()
@@ -212,10 +241,7 @@ public class FishAgent : MonoBehaviour
                 continue;
 
             float dist =
-                Vector3.Distance(
-                    localPosition,
-                    other.localPosition
-                );
+                Vector3.Distance(localPosition, other.localPosition);
 
             if (dist < neighborRadius)
             {
@@ -229,9 +255,7 @@ public class FishAgent : MonoBehaviour
 
         avgVel /= count;
 
-        return SeekVelocity(
-            avgVel.normalized * maxSpeed
-        );
+        return SeekDirection(avgVel.normalized);
     }
 
     Vector3 Cohesion()
@@ -245,10 +269,7 @@ public class FishAgent : MonoBehaviour
                 continue;
 
             float dist =
-                Vector3.Distance(
-                    localPosition,
-                    other.localPosition
-                );
+                Vector3.Distance(localPosition, other.localPosition);
 
             if (dist < neighborRadius)
             {
@@ -265,20 +286,11 @@ public class FishAgent : MonoBehaviour
         return Seek(center);
     }
 
-
-
     Vector3 Wander()
     {
-        //return Vector3.zero;
-        
-        wanderAngle += Random.Range(-wanderJitter, wanderJitter)
-                        * Time.deltaTime;
+        wanderAngle += Random.Range(-wanderJitter, wanderJitter) * Time.deltaTime;
 
-        Vector3 forward = localVelocity.normalized;
-
-        if (forward.sqrMagnitude < 0.001f)
-            forward = Vector3.forward;
-
+        Vector3 forward = localVelocity; // always unit length already
 
         Vector3 circleOffset =
             new Vector3(
@@ -287,55 +299,41 @@ public class FishAgent : MonoBehaviour
                 0
             ) * wanderRadius;
 
-
-        // Quaternion rotation =
-        //     Quaternion.LookRotation(forward);
-
         Quaternion rotation = transform.localRotation;
-
 
         Vector3 displacement = rotation * circleOffset;
 
-
         Vector3 circleCenter =
-            localPosition +
-            forward * wanderDistance;
+            localPosition + forward * wanderDistance;
 
+        Vector3 target = circleCenter + displacement;
 
-        Vector3 target =
-            circleCenter +
-            displacement;
-
-
-        // Debug values
         debugCircleCenter = circleCenter;
         debugWanderPoint = target;
         debugTarget = target;
 
-
         return Seek(target);
     }
 
+    // Returns a steering correction toward a target direction (unit vectors only)
     Vector3 Seek(Vector3 target)
     {
-        Vector3 desired =
-            (target - localPosition).normalized
-            * maxSpeed;
+        Vector3 desiredDirection =
+            (target - localPosition).normalized;
 
-        return desired - localVelocity;
+        return desiredDirection - localVelocity;
     }
 
-    Vector3 SeekVelocity(Vector3 desired)
+    Vector3 SeekDirection(Vector3 desiredDirection)
     {
-        return desired - localVelocity;
+        return desiredDirection - localVelocity;
     }
-
 
     void OnDrawGizmos()
     {
         if (!drawGizmos)
             return;
-        
+
         if (localVelocity.sqrMagnitude < 0.001f)
             return;
 
@@ -344,13 +342,11 @@ public class FishAgent : MonoBehaviour
         Quaternion rotation =
             Quaternion.LookRotation(forward);
 
-
         Vector3 worldCircleCenter =
             transform.position +
             tank.transform.TransformDirection(
                 debugCircleCenter - localPosition
             );
-
 
         Vector3 worldWanderPoint =
             transform.position +
@@ -358,69 +354,32 @@ public class FishAgent : MonoBehaviour
                 debugWanderPoint - localPosition
             );
 
-
-        // Wander circle
         Gizmos.color = Color.yellow;
+        DrawCircle(worldCircleCenter, rotation, wanderRadius);
 
-        DrawCircle(
-            worldCircleCenter,
-            rotation,
-            wanderRadius
-        );
-
-
-        // Wander distance
         Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, worldCircleCenter);
 
-        Gizmos.DrawLine(
-            transform.position,
-            worldCircleCenter
-        );
-
-
-        // Wander target
         Gizmos.color = Color.green;
-
-        Gizmos.DrawLine(
-            worldCircleCenter,
-            worldWanderPoint
-        );
+        Gizmos.DrawLine(worldCircleCenter, worldWanderPoint);
 
         Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(worldWanderPoint, 0.05f);
 
-        Gizmos.DrawSphere(
-            worldWanderPoint,
-            0.05f
-        );
-
-
-        // Neighbour radius
         Gizmos.color = Color.cyan;
-
-        Gizmos.DrawWireSphere(
-            transform.position,
-            neighborRadius
-        );
+        Gizmos.DrawWireSphere(transform.position, neighborRadius);
     }
 
-
-    void DrawCircle(
-        Vector3 center,
-        Quaternion rotation,
-        float radius
-    )
+    void DrawCircle(Vector3 center, Quaternion rotation, float radius)
     {
         int segments = 32;
 
         Vector3 previous =
-            center +
-            rotation *
-            new Vector3(radius, 0, 0);
+            center + rotation * new Vector3(radius, 0, 0);
 
         for (int i = 1; i <= segments; i++)
         {
-            float angle =
-                i * Mathf.PI * 2f / segments;
+            float angle = i * Mathf.PI * 2f / segments;
 
             Vector3 next =
                 center +
@@ -431,13 +390,9 @@ public class FishAgent : MonoBehaviour
                     0
                 );
 
-            Gizmos.DrawLine(
-                previous,
-                next
-            );
+            Gizmos.DrawLine(previous, next);
 
             previous = next;
         }
     }
-
 }

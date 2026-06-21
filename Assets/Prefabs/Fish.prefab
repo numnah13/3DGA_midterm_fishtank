@@ -309,7 +309,6 @@ GameObject:
   - component: {fileID: 7619951388430468774}
   - component: {fileID: 2949746768501846707}
   - component: {fileID: 3227321943625392828}
-  - component: {fileID: 4467205151492399948}
   m_Layer: 0
   m_Name: Eye_L
   m_TagString: Untagged
@@ -389,27 +388,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &4467205151492399948
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1934976773528119834}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2582070283781227898
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,7 +399,6 @@ GameObject:
   - component: {fileID: 7598355186744638505}
   - component: {fileID: 6785940957876714355}
   - component: {fileID: 8804590721914274695}
-  - component: {fileID: 6844046583642210516}
   m_Layer: 0
   m_Name: Eye_R
   m_TagString: Untagged
@@ -501,27 +478,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &6844046583642210516
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2582070283781227898}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3555593456067546106
 GameObject:
   m_ObjectHideFlags: 0
@@ -1199,14 +1155,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18da29d7a150d51ff89d8aaa336c3b9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FishAgent
-  maxSpeed: 1
-  maxForce: 2
+  wallBuffer: 0.2
+  maxTurnForce: 8
+  minSpeed: 0.05
+  maxSpeed: 0.5
+  speedJitter: 8
+  speedMatchRate: 1.5
   neighborRadius: 0.2
-  separationWeight: 2.5
-  alignmentWeight: 1
-  cohesionWeight: 2.5
-  wanderWeight: 0.5
+  separationWeight: 4
+  alignmentWeight: 3
+  cohesionWeight: 4
+  wanderWeight: 1
   drawGizmos: 1
   wanderRadius: 0.3
-  wanderDistance: 0.5
-  wanderJitter: 30
+  wanderDistance: 0.1
+  wanderJitter: 10

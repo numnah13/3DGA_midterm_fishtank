@@ -5,11 +5,11 @@ public class FishBody : MonoBehaviour
     private Transform[] segments;
 
     private Vector3[] basePositions;
-    // private float minSpeed = 0f;
-    // private float maxSpeed = 1f;
-    // [SerializeField] [Range(0f, 1f)] private float speed;
+    private float minSpeed = 0f;
+    private float maxSpeed = 1f;
+    [SerializeField] [Range(0f, 1f)] private float speed;
 
-    public float speed;
+    //public float speed;
 
 
     [SerializeField] private  float minFrequency = 2f;
@@ -30,11 +30,11 @@ public class FishBody : MonoBehaviour
         }
     }
 
-    // public float Speed
-    // {
-    //     get => speed;
-    //     set => speed = Mathf.Clamp(value, minSpeed, maxSpeed);
-    // }
+    public float Speed
+    {
+        get => speed;
+        set => speed = Mathf.Clamp(value, minSpeed, maxSpeed);
+    }
 
     void Start()
     {
@@ -51,13 +51,13 @@ public class FishBody : MonoBehaviour
         float frequency = Mathf.Lerp(
             minFrequency,
             maxFrequency,
-            speed
+            speed / maxSpeed
         );
 
         float amplitude = Mathf.Lerp(
             minAmplitude,
             maxAmplitude,
-            speed
+            speed / maxSpeed
         );
         
         float time = Time.time;
