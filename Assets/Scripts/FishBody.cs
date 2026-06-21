@@ -3,15 +3,19 @@ using UnityEngine;
 public class FishBody : MonoBehaviour
 {
     private Transform[] segments;
-    private float minSpeed = 0f;
-    private float maxSpeed = 10f;
+
     private Vector3[] basePositions;
-    [SerializeField] [Range(0f, 10f)] private float speed;
+    // private float minSpeed = 0f;
+    // private float maxSpeed = 1f;
+    // [SerializeField] [Range(0f, 1f)] private float speed;
+
+    public float speed;
+
 
     [SerializeField] private  float minFrequency = 2f;
     [SerializeField] private float maxFrequency = 30f;
 
-    [SerializeField] private  float maxAmplitude = 0.3f;
+    [SerializeField] private  float maxAmplitude = 1f; //0.3f;
     [SerializeField] private  float minAmplitude = 0.1f;
     [SerializeField] private  float phaseOffset = 0.6f;
 
@@ -26,11 +30,11 @@ public class FishBody : MonoBehaviour
         }
     }
 
-    public float Speed
-    {
-        get => speed;
-        set => speed = Mathf.Clamp(value, minSpeed, maxSpeed);
-    }
+    // public float Speed
+    // {
+    //     get => speed;
+    //     set => speed = Mathf.Clamp(value, minSpeed, maxSpeed);
+    // }
 
     void Start()
     {
@@ -47,13 +51,13 @@ public class FishBody : MonoBehaviour
         float frequency = Mathf.Lerp(
             minFrequency,
             maxFrequency,
-            speed / maxSpeed
+            speed
         );
 
         float amplitude = Mathf.Lerp(
             minAmplitude,
             maxAmplitude,
-            speed / maxSpeed
+            speed
         );
         
         float time = Time.time;
