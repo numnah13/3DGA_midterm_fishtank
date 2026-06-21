@@ -111,11 +111,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a9f22d13839443688922a9740c915495, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Fish
-  speed: 1
-  minFrequency: 2
-  maxFrequency: 30
-  maxAmplitude: 0.3
+  m_EditorClassIdentifier: Assembly-CSharp::FishBody
+  speed: 0
+  minFrequency: 22
+  maxFrequency: 22
+  maxAmplitude: 0.5
   minAmplitude: 0.1
   phaseOffset: 0.6
 --- !u!1 &1478220453247896181
@@ -1166,7 +1166,7 @@ MonoBehaviour:
   alignmentWeight: 3
   cohesionWeight: 4
   wanderWeight: 1
-  drawGizmos: 1
+  drawGizmos: 0
   wanderRadius: 0.3
   wanderDistance: 0.1
   wanderJitter: 10

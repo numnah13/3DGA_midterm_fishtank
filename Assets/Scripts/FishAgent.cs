@@ -150,7 +150,8 @@ public class FishAgent : MonoBehaviour
         );
 
         currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed);
-        Debug.Log("currentSpeed: " + currentSpeed);
+        float normalizedSpeed = (currentSpeed - minSpeed) / (maxSpeed - minSpeed);
+        fishBody.Speed = normalizedSpeed;
     }
 
 

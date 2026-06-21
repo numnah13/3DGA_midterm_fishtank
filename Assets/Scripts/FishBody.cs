@@ -12,10 +12,10 @@ public class FishBody : MonoBehaviour
     //public float speed;
 
 
-    [SerializeField] private  float minFrequency = 2f;
-    [SerializeField] private float maxFrequency = 30f;
+    [SerializeField] private  float minFrequency = 22f;
+    [SerializeField] private float maxFrequency = 22f;
 
-    [SerializeField] private  float maxAmplitude = 1f; //0.3f;
+    [SerializeField] private  float maxAmplitude = 0.5f; //0.3f;
     [SerializeField] private  float minAmplitude = 0.1f;
     [SerializeField] private  float phaseOffset = 0.6f;
 
