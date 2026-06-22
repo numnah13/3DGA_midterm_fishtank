@@ -5,8 +5,8 @@ public class FishAgent : MonoBehaviour
     FishTank tank;
 
     Vector3 localPosition;
-    Vector3 localVelocity; 
-    FishBody fishBody;
+    Vector3 localVelocity;
+
     float wanderAngle;
     Vector3 currentUp = Vector3.up;
 
@@ -23,7 +23,7 @@ public class FishAgent : MonoBehaviour
     [Header("Speed")]
     [SerializeField] float minSpeed = 0.05f;
     [SerializeField] float maxSpeed = 0.5f;
-    [SerializeField] float speedJitter = 8f;     // how fast personal speed wanders per second
+    [SerializeField] float speedJitter = 8f;     // how quickly the fish's individual speed changes over time
     [SerializeField] float speedMatchRate = 1.5f;  // how strongly neighbors pull speed toward their average
 
     float currentSpeed;       // this fish's actual moving speed, unit/sec
@@ -44,10 +44,21 @@ public class FishAgent : MonoBehaviour
     [SerializeField] float wanderDistance = 0.1f;
     [SerializeField] float wanderJitter = 10f;
 
-    void Awake()
-    {
-        fishBody = GetComponentInChildren<FishBody>();
-    }
+    // [Header("Body")]
+    // [SerializeField] FishBody fishBody;
+
+    [Header("Orientation control")]
+    [SerializeField] Transform pitchNode;
+    float previousYaw;
+    float previousPitch;
+
+    float currentYaw;
+    float currentPitch;
+
+    // void Awake()
+    // {
+    //     fishBody = GetComponentInChildren<FishBody>();
+    // }
 
     public void Initialize(FishTank tank, Vector3 localPos)
     {
@@ -83,7 +94,7 @@ public class FishAgent : MonoBehaviour
         // Clamp how strongly heading can be pushed this frame
         steering = Vector3.ClampMagnitude(steering, maxTurnForce);
 
-        // Steering only ever changes direction, never magnitude
+        // Steering only changes direction, never magnitude
         localVelocity += steering * dt;
         localVelocity = localVelocity.sqrMagnitude > 0.0001f
             ? localVelocity.normalized
@@ -98,17 +109,36 @@ public class FishAgent : MonoBehaviour
 
         transform.localPosition = localPosition;
 
-        // Prevent spinning
-        Vector3 worldVelocity =
-            tank.transform.TransformDirection(localVelocity);
+        // Spins
+        // Vector3 worldVelocity =
+        //     tank.transform.TransformDirection(localVelocity);
+        // transform.rotation = Quaternion.LookRotation(
+        //     worldVelocity,
+        //     tank.transform.up
+        // );
 
-        Vector3 right = Vector3.Cross(currentUp, worldVelocity);
-        currentUp = Vector3.Cross(worldVelocity, right).normalized;
+        // Control orientation without spinning
+        previousYaw = currentYaw;
+        previousPitch = currentPitch;
+        Vector3 localDir = localVelocity.normalized;
+        currentYaw = Mathf.Atan2(localDir.x, localDir.z) * Mathf.Rad2Deg;
+        currentPitch =
+            -Mathf.Atan2(
+                localDir.y,
+                new Vector2(localDir.x, localDir.z).magnitude
+            ) * Mathf.Rad2Deg;
+        currentPitch = Mathf.Clamp(currentPitch, -85f, 85f);
+        transform.localRotation = Quaternion.Euler(0f, currentYaw, 0f);
+        pitchNode.localRotation = Quaternion.Euler(currentPitch, 0f, 0f);
 
-        transform.rotation = Quaternion.LookRotation(
-            worldVelocity,
-            currentUp
-        );
+
+
+        // Current turn
+        // float yawDelta = Mathf.DeltaAngle(previousYaw, currentYaw);
+        // float pitchDelta = Mathf.DeltaAngle(previousPitch, currentPitch);
+        // fishBody.Yaw = yawDelta;
+        // fishBody.Pitch = pitchDelta;
+
     }
 
     void UpdateSpeed(float dt)
@@ -149,9 +179,9 @@ public class FishAgent : MonoBehaviour
             speedMatchRate * dt
         );
 
-        currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed);
-        float normalizedSpeed = (currentSpeed - minSpeed) / (maxSpeed - minSpeed);
-        fishBody.Speed = normalizedSpeed;
+        // currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed);
+        // float normalizedSpeed = (currentSpeed - minSpeed) / (maxSpeed - minSpeed);
+        // fishBody.Speed = normalizedSpeed;
     }
 
 
@@ -330,45 +360,114 @@ public class FishAgent : MonoBehaviour
         return desiredDirection - localVelocity;
     }
 
+    // void OnDrawGizmos()
+    // {
+    //     if (!drawGizmos)
+    //         return;
+
+    //     if (localVelocity.sqrMagnitude < 0.001f)
+    //         return;
+
+    //     Vector3 forward = localVelocity.normalized;
+
+    //     Quaternion rotation =
+    //         Quaternion.LookRotation(forward);
+
+    //     Vector3 worldCircleCenter =
+    //         transform.position +
+    //         tank.transform.TransformDirection(
+    //             debugCircleCenter - localPosition
+    //         );
+
+    //     Vector3 worldWanderPoint =
+    //         transform.position +
+    //         tank.transform.TransformDirection(
+    //             debugWanderPoint - localPosition
+    //         );
+
+    //     Gizmos.color = Color.yellow;
+    //     DrawCircle(worldCircleCenter, rotation, wanderRadius);
+
+    //     Gizmos.color = Color.red;
+    //     Gizmos.DrawLine(transform.position, worldCircleCenter);
+
+    //     Gizmos.color = Color.green;
+    //     Gizmos.DrawLine(worldCircleCenter, worldWanderPoint);
+
+    //     Gizmos.color = Color.blue;
+    //     Gizmos.DrawSphere(worldWanderPoint, 0.05f);
+
+    //     Gizmos.color = Color.cyan;
+    //     Gizmos.DrawWireSphere(transform.position, neighborRadius);
+    // }
+
     void OnDrawGizmos()
     {
-        if (!drawGizmos)
+        if (!drawGizmos || tank == null)
             return;
 
         if (localVelocity.sqrMagnitude < 0.001f)
             return;
 
+        // Fish's actual travel direction in tank local space
         Vector3 forward = localVelocity.normalized;
 
-        Quaternion rotation =
-            Quaternion.LookRotation(forward);
+        // Build a stable basis around the velocity
+        Vector3 referenceUp = Vector3.up;
 
+        // Handle near-vertical movement
+        if (Mathf.Abs(Vector3.Dot(forward, referenceUp)) > 0.99f)
+            referenceUp = Vector3.right;
+
+        Vector3 right =
+            Vector3.Cross(referenceUp, forward).normalized;
+
+        Vector3 up =
+            Vector3.Cross(forward, right).normalized;
+
+        Quaternion rotation =
+            Quaternion.LookRotation(forward, up);
+
+        // Convert local-space debug points into world space
         Vector3 worldCircleCenter =
-            transform.position +
-            tank.transform.TransformDirection(
-                debugCircleCenter - localPosition
-            );
+            tank.transform.TransformPoint(debugCircleCenter);
 
         Vector3 worldWanderPoint =
-            transform.position +
-            tank.transform.TransformDirection(
-                debugWanderPoint - localPosition
-            );
+            tank.transform.TransformPoint(debugWanderPoint);
 
         Gizmos.color = Color.yellow;
         DrawCircle(worldCircleCenter, rotation, wanderRadius);
 
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, worldCircleCenter);
+        Gizmos.DrawLine(
+            transform.position,
+            worldCircleCenter
+        );
 
         Gizmos.color = Color.green;
-        Gizmos.DrawLine(worldCircleCenter, worldWanderPoint);
+        Gizmos.DrawLine(
+            worldCircleCenter,
+            worldWanderPoint
+        );
 
         Gizmos.color = Color.blue;
-        Gizmos.DrawSphere(worldWanderPoint, 0.05f);
+        Gizmos.DrawSphere(
+            worldWanderPoint,
+            0.05f
+        );
 
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, neighborRadius);
+        Gizmos.DrawWireSphere(
+            transform.position,
+            neighborRadius
+        );
+
+        // Optional: show actual velocity
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawRay(
+            transform.position,
+            tank.transform.TransformDirection(forward) * 0.5f
+        );
     }
 
     void DrawCircle(Vector3 center, Quaternion rotation, float radius)

@@ -21,9 +21,18 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         // Look around
-        Vector2 delta = Mouse.current.delta.ReadValue();
-        yaw += delta.x * rotateSensitivity * Time.deltaTime;
-        pitch -= delta.y * rotateSensitivity * Time.deltaTime;
+        Vector2 delta;
+
+        if (Mouse.current != null)
+        {
+            delta = Mouse.current.delta.ReadValue();
+
+            yaw += delta.x * rotateSensitivity * Time.deltaTime;
+            pitch -= delta.y * rotateSensitivity * Time.deltaTime;
+        }
+        
+        // yaw += delta.x * rotateSensitivity * Time.deltaTime;
+        // pitch -= delta.y * rotateSensitivity * Time.deltaTime;
 
         pitch = Mathf.Clamp(pitch, -89f, 89f);
 
