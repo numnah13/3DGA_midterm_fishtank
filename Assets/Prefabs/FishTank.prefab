@@ -127,6 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FishTank
   fishPrefab: {fileID: 7474079998963846124, guid: f7a750927b0b907a1a6fd1bf513b61c6, type: 3}
+  visualTank: {fileID: 0}
   fishCount: 50
 --- !u!114 &1622748602712223666
 MonoBehaviour:

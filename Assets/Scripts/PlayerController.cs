@@ -4,43 +4,61 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private Transform cameraTransform;
-    [SerializeField] float moveSpeed = 5f;
-    [SerializeField] float rotateSensitivity = 10f;
+
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float rotateSensitivity = 10f;
+    [SerializeField] private float gravity = -9.81f;
+
+    private float verticalVelocity;
     private float yaw;
     private float pitch;
-    
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private CharacterController characterController;
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        characterController = GetComponent<CharacterController>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // Look around
-        Vector2 delta;
+        Look();
+        Move();
+    }
 
+    void Look()
+    {
         if (Mouse.current != null)
         {
-            delta = Mouse.current.delta.ReadValue();
+            Vector2 delta = Mouse.current.delta.ReadValue();
 
             yaw += delta.x * rotateSensitivity * Time.deltaTime;
             pitch -= delta.y * rotateSensitivity * Time.deltaTime;
         }
-        
-        // yaw += delta.x * rotateSensitivity * Time.deltaTime;
-        // pitch -= delta.y * rotateSensitivity * Time.deltaTime;
 
         pitch = Mathf.Clamp(pitch, -89f, 89f);
 
         transform.rotation = Quaternion.Euler(0f, yaw, 0f);
         cameraTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+    }
 
+    void Move()
+    {
+        // Gravity
+        if (characterController.isGrounded)
+        {
+            // Small downward force keeps the controller grounded
+            verticalVelocity = -2f;
+        }
+        else
+        {
+            verticalVelocity += gravity * Time.deltaTime;
+        }
 
-        // Move 
+        // Movement directions constrained to horizontal plane
         Vector3 forward = transform.forward;
         forward.y = 0f;
         forward.Normalize();
@@ -63,12 +81,15 @@ public class PlayerController : MonoBehaviour
         if (Keyboard.current.dKey.isPressed)
             move += right;
 
-        if (move.sqrMagnitude > 0)
-        {
+        if (move.sqrMagnitude > 1f)
             move.Normalize();
 
-            transform.position += move * moveSpeed * Time.deltaTime;
-        }
+        Vector3 velocity =
+            move * moveSpeed +
+            Vector3.up * verticalVelocity;
 
+        characterController.Move(
+            velocity * Time.deltaTime
+        );
     }
 }
