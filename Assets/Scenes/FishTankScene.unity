@@ -1159,7 +1159,7 @@ Light:
   serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 13.03
+  m_Intensity: 8
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -1508,6 +1508,7 @@ MonoBehaviour:
   cameraTransform: {fileID: 330585546}
   moveSpeed: 5
   rotateSensitivity: 10
+  gravity: -9.81
 --- !u!4 &972872539
 Transform:
   m_ObjectHideFlags: 0
@@ -2766,7 +2767,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 0d2ed163860809d48ab2e72792d683e8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.1158329
+      value: 1.17
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 0d2ed163860809d48ab2e72792d683e8, type: 3}
       propertyPath: m_LocalPosition.y
