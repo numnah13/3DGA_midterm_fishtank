@@ -72,7 +72,7 @@ GameObject:
   - component: {fileID: 1674132575736532740}
   - component: {fileID: 4717274935121710058}
   m_Layer: 0
-  m_Name: Cube (5)
+  m_Name: WeedSegment6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -162,7 +162,7 @@ GameObject:
   - component: {fileID: 7225859700239062748}
   - component: {fileID: 4990509238818292321}
   m_Layer: 0
-  m_Name: Cube (6)
+  m_Name: WeedSegment7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -252,7 +252,7 @@ GameObject:
   - component: {fileID: 2908616738906727742}
   - component: {fileID: 6392397284804835174}
   m_Layer: 0
-  m_Name: Cube (4)
+  m_Name: WeedSegment5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -342,7 +342,7 @@ GameObject:
   - component: {fileID: 4528750169670517921}
   - component: {fileID: 203506567770973295}
   m_Layer: 0
-  m_Name: Cube (9)
+  m_Name: WeedSegment10
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -432,7 +432,7 @@ GameObject:
   - component: {fileID: 713276480753963804}
   - component: {fileID: 2810667018190781438}
   m_Layer: 0
-  m_Name: Cube (3)
+  m_Name: WeedSegment4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -522,7 +522,7 @@ GameObject:
   - component: {fileID: 8949724817055401055}
   - component: {fileID: 631119917461219068}
   m_Layer: 0
-  m_Name: Cube (7)
+  m_Name: WeedSegment8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -612,7 +612,7 @@ GameObject:
   - component: {fileID: 1547030288286141185}
   - component: {fileID: 8617067391500079322}
   m_Layer: 0
-  m_Name: Cube (1)
+  m_Name: WeedSegment2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -702,7 +702,7 @@ GameObject:
   - component: {fileID: 6687414939966908946}
   - component: {fileID: 1206490775757679292}
   m_Layer: 0
-  m_Name: Cube (8)
+  m_Name: WeedSegment9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -792,7 +792,7 @@ GameObject:
   - component: {fileID: 8928499002731950253}
   - component: {fileID: 7462892721296599468}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: WeedSegment1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -882,7 +882,7 @@ GameObject:
   - component: {fileID: 2763465843221751925}
   - component: {fileID: 6625166656875406509}
   m_Layer: 0
-  m_Name: Cube (2)
+  m_Name: WeedSegment3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

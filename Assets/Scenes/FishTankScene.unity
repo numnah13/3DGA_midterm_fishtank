@@ -1507,8 +1507,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   cameraTransform: {fileID: 330585546}
   moveSpeed: 5
-  rotateSensitivity: 10
-  gravity: -9.81
+  rotateSensitivity: 5
 --- !u!4 &972872539
 Transform:
   m_ObjectHideFlags: 0
@@ -2857,7 +2856,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8257794139809643192, guid: 574eb2365045a4202b9cb38f005a8615, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.526
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8257794139809643192, guid: 574eb2365045a4202b9cb38f005a8615, type: 3}
       propertyPath: m_LocalPosition.y

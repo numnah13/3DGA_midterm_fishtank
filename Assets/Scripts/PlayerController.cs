@@ -1,14 +1,15 @@
+// SOURCE: adapted from https://www.youtube.com/watch?v=_QajrabyTJc
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private Transform cameraTransform;
-
     [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float rotateSensitivity = 10f;
-    [SerializeField] private float gravity = -9.81f;
-
+    [SerializeField] private float rotateSensitivity = 5f;
+    
+    private float gravity = -9.81f;
     private float verticalVelocity;
     private float yaw;
     private float pitch;
@@ -48,17 +49,10 @@ public class PlayerController : MonoBehaviour
     void Move()
     {
         // Gravity
-        if (characterController.isGrounded)
-        {
-            // Small downward force keeps the controller grounded
-            verticalVelocity = -2f;
-        }
-        else
-        {
+        if (!characterController.isGrounded)
             verticalVelocity += gravity * Time.deltaTime;
-        }
 
-        // Movement directions constrained to horizontal plane
+        // Movement directions on horizontal plane only
         Vector3 forward = transform.forward;
         forward.y = 0f;
         forward.Normalize();
@@ -84,12 +78,8 @@ public class PlayerController : MonoBehaviour
         if (move.sqrMagnitude > 1f)
             move.Normalize();
 
-        Vector3 velocity =
-            move * moveSpeed +
-            Vector3.up * verticalVelocity;
+        Vector3 velocity = move * moveSpeed + Vector3.up * verticalVelocity;
 
-        characterController.Move(
-            velocity * Time.deltaTime
-        );
+        characterController.Move(velocity * Time.deltaTime);
     }
 }

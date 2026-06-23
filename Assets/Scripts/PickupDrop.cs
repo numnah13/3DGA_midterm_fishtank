@@ -1,8 +1,9 @@
-using Unity.VisualScripting;
+// SOURCE: https://www.youtube.com/watch?v=2IhzPTS4av4
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// SOURCE: https://www.youtube.com/watch?v=2IhzPTS4av4
+
 
 public class PickupDrop : MonoBehaviour
 {
@@ -14,7 +15,6 @@ public class PickupDrop : MonoBehaviour
     private ObjectGrabbable grabbable;
 
 
-    // Update is called once per frame
     void Update()
     {
         if (Keyboard.current.eKey.wasPressedThisFrame)
@@ -47,12 +47,7 @@ public class PickupDrop : MonoBehaviour
         if (grabbable != null)
         {
             float scroll = Mouse.current.scroll.y.ReadValue();
-
-            grabbable.transform.Rotate(
-                Vector3.up,
-                scroll * rotateSpeed * Time.deltaTime,
-                Space.World
-            );
+            grabbable.RotateY(scroll, rotateSpeed);
         }
     }
 }

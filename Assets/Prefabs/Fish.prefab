@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: 3027982277871005835}
   - component: {fileID: 3276174756648766360}
   m_Layer: 0
-  m_Name: Sphere (8)
+  m_Name: Tail9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -282,7 +282,7 @@ GameObject:
   - component: {fileID: 4439857700036840913}
   - component: {fileID: 8265394110914850056}
   m_Layer: 0
-  m_Name: Sphere (5)
+  m_Name: Tail6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -503,7 +503,7 @@ GameObject:
   - component: {fileID: 8434649014420641043}
   - component: {fileID: 4426426599927144976}
   m_Layer: 0
-  m_Name: Sphere (3)
+  m_Name: Tail4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -593,7 +593,7 @@ GameObject:
   - component: {fileID: 7483345701153790214}
   - component: {fileID: 7031025550220123047}
   m_Layer: 0
-  m_Name: Sphere (7)
+  m_Name: Tail8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -683,7 +683,7 @@ GameObject:
   - component: {fileID: 5230337157495079100}
   - component: {fileID: 1662582980907234272}
   m_Layer: 0
-  m_Name: Sphere (4)
+  m_Name: Tail5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -773,7 +773,7 @@ GameObject:
   - component: {fileID: 7103228862433418824}
   - component: {fileID: 8362374619227239681}
   m_Layer: 0
-  m_Name: Sphere (6)
+  m_Name: Tail7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -863,7 +863,7 @@ GameObject:
   - component: {fileID: 8765689558225290837}
   - component: {fileID: 837526107114042090}
   m_Layer: 0
-  m_Name: Sphere (2)
+  m_Name: Tail3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -953,7 +953,7 @@ GameObject:
   - component: {fileID: 7983567272763783749}
   - component: {fileID: 7099673219909778260}
   m_Layer: 0
-  m_Name: Sphere (1)
+  m_Name: Tail2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1043,7 +1043,7 @@ GameObject:
   - component: {fileID: 9039859090741477640}
   - component: {fileID: 5719813322197637049}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: Tail1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1180,10 +1180,10 @@ MonoBehaviour:
   alignmentWeight: 3
   cohesionWeight: 4
   wanderWeight: 1
-  drawGizmos: 0
   wanderRadius: 0.3
   wanderDistance: 0.5
-  wanderJitter: 1
+  wanderJitter: 20
+  drawGizmos: 1
   pitchNode: {fileID: 1773055419037099922}
 --- !u!114 &295135722325601818
 MonoBehaviour:

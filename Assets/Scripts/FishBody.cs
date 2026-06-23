@@ -1,38 +1,24 @@
+// SOURCE: adapted from https://discussions.unity.com/t/fish-tail-movement/859850
+
 using UnityEngine;
 using System.Collections.Generic;
 
 public class FishBody : MonoBehaviour
 {
+    // Nodes involved
+    [Header("Nodes involved")]
     [SerializeField] Transform head;
-
-    // The frame everything is recorded/applied relative to.
-    // Assign this to the Tank transform in the inspector.
+    [SerializeField] private Transform[] tailSegments;
     private Transform referenceFrame;
 
-    [SerializeField] private Transform[] tailSegments;
-
-
-    private Vector3[] basePositions;
-    // private float minSpeed = 0f;
-    // private float maxSpeed = 1f;
-
-    // [SerializeField][Range(0f, 1f)] private float speed;
-
-
-
-    // [SerializeField] private float minFrequency = 22f;
-    // [SerializeField] private float maxFrequency = 22f;
-
-    // [SerializeField] private float minAmplitude = 0.1f;
-    // [SerializeField] private float maxAmplitude = 0.5f; //0.3f;
-
-    // [SerializeField] private float phaseOffset = 0.6f;
-
-
+    // Animation properties
+    [Header("Animation properties")]
     [SerializeField] private int frameDelay = 2;
     [SerializeField] private float followSpeed = 22f;
     [SerializeField] private float rotationSpeed = 180f;
 
+    // History of positions
+    private Vector3[] basePositions;
     private List<Frame>[] formerPositions;
 
 
@@ -46,16 +32,8 @@ public class FishBody : MonoBehaviour
 
     void Awake()
     {
-        referenceFrame = GameObject.FindWithTag("Tank").transform;
-        if (referenceFrame == null)
-        {
-            // Fallback: walk up to the topmost parent if nothing assigned.
-            referenceFrame = transform.root;
-            Debug.LogWarning(
-                $"{name}: referenceFrame not assigned, defaulting to root '{referenceFrame.name}'. " +
-                "Assign the Tank transform explicitly in the inspector."
-            );
-        }
+        // MY CODE
+        referenceFrame = GameObject.FindWithTag("Tank").transform; 
 
         formerPositions = new List<Frame>[tailSegments.Length + 1];
 
@@ -66,13 +44,6 @@ public class FishBody : MonoBehaviour
             formerPositions[i] = new List<Frame>();
         }
     }
-
-    // public float Speed
-    // {
-    //     get => speed;
-    //     set => speed = Mathf.Clamp(value, minSpeed, maxSpeed);
-    // }
-
 
 
     void Start()
@@ -107,13 +78,13 @@ public class FishBody : MonoBehaviour
 
     void AddFrame(List<Frame> history, Vector3 worldPosition, Quaternion worldRotation)
     {
-        // Convert world -> tank-relative space before storing.
-        Vector3 localPos = referenceFrame.InverseTransformPoint(worldPosition);
-        Quaternion localRot = Quaternion.Inverse(referenceFrame.rotation) * worldRotation;
+        Vector3 localPos = referenceFrame.InverseTransformPoint(worldPosition); // MY CODE
+        Quaternion localRot = Quaternion.Inverse(referenceFrame.rotation) * worldRotation; // MY CODE
 
-        if (history.Count == 0 || localPos != history[0].localPosition)
+        if (history.Count == 0 || localPos != history[0].localPosition) // MY CODE
         {
-            history.Insert(0,
+            history.Insert(
+                0,
                 new Frame
                 {
                     localPosition = localPos,
@@ -121,7 +92,7 @@ public class FishBody : MonoBehaviour
                 }
             );
 
-            if (history.Count > frameDelay + 5)
+            if (history.Count > frameDelay + 2)
             {
                 history.RemoveAt(history.Count - 1);
             }
@@ -140,21 +111,16 @@ public class FishBody : MonoBehaviour
             {
                 Frame frame = formerPositions[leaderIndex][frameDelay];
 
-                // Convert the stored tank-relative frame back to world space
-                // using the tank's CURRENT transform - this is what makes
-                // tank movement "free" instead of dragging old history along.
-                Vector3 targetWorldPos = referenceFrame.TransformPoint(frame.localPosition);
-                Quaternion targetWorldRot = referenceFrame.rotation * frame.localRotation;
+                Vector3 targetWorldPos = referenceFrame.TransformPoint(frame.localPosition); // MY CODE
+                Quaternion targetWorldRot = referenceFrame.rotation * frame.localRotation; // MY CODE
 
-                tailSegments[i].position =
-                    Vector3.Lerp(
+                tailSegments[i].position = Vector3.Lerp( // MY CODE
                         tailSegments[i].position,
                         targetWorldPos,
                         followSpeed * Time.deltaTime
                     );
 
-                tailSegments[i].rotation =
-                    Quaternion.RotateTowards(
+                tailSegments[i].rotation = Quaternion.RotateTowards(
                         tailSegments[i].rotation,
                         targetWorldRot,
                         rotationSpeed * Time.deltaTime

@@ -1,18 +1,17 @@
+// MY CODE
+
 using UnityEngine;
 
 public class SeaWeed : MonoBehaviour
 {
     private Transform[] segments;
-
     private Vector3[] basePositions;
 
+    [Header("Animation properties")]
     [SerializeField] [Range(0f, 1f)] private float speed;
-
-
     [SerializeField] private  float minFrequency = 0f;
     [SerializeField] private float maxFrequency = 22f;
-
-    [SerializeField] private  float maxAmplitude = 0.5f; //0.3f;
+    [SerializeField] private  float maxAmplitude = 0.5f; 
     [SerializeField] private  float minAmplitude = 0f;
     [SerializeField] private  float phaseOffset = 0.6f;
 
@@ -42,6 +41,7 @@ public class SeaWeed : MonoBehaviour
     {
         float time = Time.time;
         
+        // Higher speed produces larger and faster oscillations.
         float frequency = Mathf.Lerp(
             minFrequency,
             maxFrequency,
@@ -54,10 +54,11 @@ public class SeaWeed : MonoBehaviour
             speed
         );
         
+        // Distribute sine wave offset gradually increasing from weed's base to its tip
         float sineWeight;
         for (int i = 0; i < segments.Length; i++)
         {
-            sineWeight = (i + 1f) / segments.Length;
+            sineWeight = (i + 1f) / segments.Length; // increasing sine weight
             Vector3 pos = basePositions[i];
 
             pos.x += Mathf.Sin(
@@ -68,11 +69,6 @@ public class SeaWeed : MonoBehaviour
 
             segments[i].localPosition = pos;
         }
-        
-
-
-
     }
-
 
 }
