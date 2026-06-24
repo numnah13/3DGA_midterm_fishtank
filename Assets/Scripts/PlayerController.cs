@@ -1,27 +1,21 @@
-// SOURCE: adapted from https://www.youtube.com/watch?v=_QajrabyTJc
+// MY CODE START
 
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
-{
-    [SerializeField] private Transform cameraTransform;
+{   
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotateSensitivity = 5f;
     
-    private float gravity = -9.81f;
-    private float verticalVelocity;
     private float yaw;
     private float pitch;
 
-    private CharacterController characterController;
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        characterController = GetComponent<CharacterController>();
     }
 
     void Update()
@@ -32,26 +26,23 @@ public class PlayerController : MonoBehaviour
 
     void Look()
     {
+        // Map mouse screen coordinates onto pitch and yaw
         if (Mouse.current != null)
         {
-            Vector2 delta = Mouse.current.delta.ReadValue();
+            Vector2 mouseDelta = Mouse.current.delta.ReadValue();
 
-            yaw += delta.x * rotateSensitivity * Time.deltaTime;
-            pitch -= delta.y * rotateSensitivity * Time.deltaTime;
+            yaw += mouseDelta.x * rotateSensitivity * Time.deltaTime; 
+            pitch -= mouseDelta.y * rotateSensitivity * Time.deltaTime; 
         }
+ 
+        // Rebuild new orientation fresh from the current pitch and yaw values
+        transform.rotation = Quaternion.Euler(pitch, yaw, 0f); 
 
-        pitch = Mathf.Clamp(pitch, -89f, 89f);
-
-        transform.rotation = Quaternion.Euler(0f, yaw, 0f);
-        cameraTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
     }
+
 
     void Move()
     {
-        // Gravity
-        if (!characterController.isGrounded)
-            verticalVelocity += gravity * Time.deltaTime;
-
         // Movement directions on horizontal plane only
         Vector3 forward = transform.forward;
         forward.y = 0f;
@@ -78,8 +69,18 @@ public class PlayerController : MonoBehaviour
         if (move.sqrMagnitude > 1f)
             move.Normalize();
 
-        Vector3 velocity = move * moveSpeed + Vector3.up * verticalVelocity;
+        Vector3 deltaPosition = move * moveSpeed * Time.deltaTime;
+        transform.position += deltaPosition;
 
-        characterController.Move(velocity * Time.deltaTime);
+
+        // Clamp position to contain within the room
+        Vector3 position = transform.position;
+
+        position.x = Mathf.Clamp(position.x, -8.5f, 2f);
+        position.z = Mathf.Clamp(position.z, 0.5f, 6f);
+
+        transform.position = position;
     }
 }
+
+// MY CODE END

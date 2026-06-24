@@ -1,4 +1,4 @@
-// SOURCE: adapted from https://discussions.unity.com/t/fish-tail-movement/859850
+// SOURCE: adapted from https://discussions.unity.com/t/snake-like-trail-of-gameobjects-following-a-leader/43513/2
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -32,8 +32,9 @@ public class FishBody : MonoBehaviour
 
     void Awake()
     {
-        // MY CODE
+        // MY CODE START
         referenceFrame = GameObject.FindWithTag("Tank").transform; 
+        // MY CODE END
 
         formerPositions = new List<Frame>[tailSegments.Length + 1];
 
@@ -76,12 +77,13 @@ public class FishBody : MonoBehaviour
         }
     }
 
+    // MY CODE START
     void AddFrame(List<Frame> history, Vector3 worldPosition, Quaternion worldRotation)
     {
-        Vector3 localPos = referenceFrame.InverseTransformPoint(worldPosition); // MY CODE
-        Quaternion localRot = Quaternion.Inverse(referenceFrame.rotation) * worldRotation; // MY CODE
+        Vector3 localPos = referenceFrame.InverseTransformPoint(worldPosition); 
+        Quaternion localRot = Quaternion.Inverse(referenceFrame.rotation) * worldRotation; 
 
-        if (history.Count == 0 || localPos != history[0].localPosition) // MY CODE
+        if (history.Count == 0 || localPos != history[0].localPosition) 
         {
             history.Insert(
                 0,
@@ -98,6 +100,7 @@ public class FishBody : MonoBehaviour
             }
         }
     }
+    // MY CODE END
 
 
 
@@ -111,6 +114,7 @@ public class FishBody : MonoBehaviour
             {
                 Frame frame = formerPositions[leaderIndex][frameDelay];
 
+                // MY CODE START
                 Vector3 targetWorldPos = referenceFrame.TransformPoint(frame.localPosition); // MY CODE
                 Quaternion targetWorldRot = referenceFrame.rotation * frame.localRotation; // MY CODE
 
@@ -119,7 +123,7 @@ public class FishBody : MonoBehaviour
                         targetWorldPos,
                         followSpeed * Time.deltaTime
                     );
-
+                // MY CODE END
                 tailSegments[i].rotation = Quaternion.RotateTowards(
                         tailSegments[i].rotation,
                         targetWorldRot,

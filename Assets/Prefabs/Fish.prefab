@@ -1169,21 +1169,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18da29d7a150d51ff89d8aaa336c3b9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FishAgent
-  wallBuffer: 0.2
   maxTurnForce: 8
   minSpeed: 0.05
   maxSpeed: 0.4
   speedJitter: 8
   speedMatchRate: 1.5
   neighborRadius: 0.2
-  separationWeight: 4
-  alignmentWeight: 3
-  cohesionWeight: 4
-  wanderWeight: 1
+  separationWeight: 3
+  alignmentWeight: 2
+  cohesionWeight: 3
+  wanderWeight: 1.5
+  containmentWeight: 4
   wanderRadius: 0.3
   wanderDistance: 0.5
   wanderJitter: 20
-  drawGizmos: 1
+  drawGizmos: 0
   pitchNode: {fileID: 1773055419037099922}
 --- !u!114 &295135722325601818
 MonoBehaviour:

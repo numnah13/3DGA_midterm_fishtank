@@ -22,6 +22,7 @@ public class ObjectGrabbable : MonoBehaviour
             RigidbodyConstraints.FreezeRotationZ;
 
         rb.useGravity = false;
+        rb.isKinematic = true;
         rb.freezeRotation = true;
     }
 
@@ -29,20 +30,23 @@ public class ObjectGrabbable : MonoBehaviour
     {
         this.objectGrabPoint = null;
         rb.useGravity = true;
+        rb.isKinematic = false;
         rb.freezeRotation = false;
     }
 
-    public void RotateY(float amount, float speed) // MY CODE
-        {
-            if (amount == 0f)
-                return;
+    // MY CODE START
+    public void RotateY(float amount, float speed) 
+    {
+        if (amount == 0f)
+            return;
 
-            transform.Rotate(
-                Vector3.up,
-                amount * speed * Time.deltaTime,
-                Space.World
-            );
-        }
+        transform.Rotate(
+            Vector3.up,
+            amount * speed * Time.deltaTime,
+            Space.World
+        );
+    }
+    // MY CODE END
 
     private void FixedUpdate()
     {
@@ -57,6 +61,7 @@ public class ObjectGrabbable : MonoBehaviour
 
         }
     }
+
 
 }
 

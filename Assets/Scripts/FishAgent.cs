@@ -1,3 +1,5 @@
+// MY CODE START
+
 using UnityEngine;
 
 public class FishAgent : MonoBehaviour
@@ -6,9 +8,7 @@ public class FishAgent : MonoBehaviour
     Vector3 localPosition;
     Vector3 localVelocity;
 
-
     [Header("Tank")]
-    [SerializeField] float wallBuffer = 0.2f;
     FishTank tank;
 
     [Header("Turning")]
@@ -29,13 +29,14 @@ public class FishAgent : MonoBehaviour
     [SerializeField] float separationWeight = 4f; 
     [SerializeField] float alignmentWeight = 3f; 
     [SerializeField] float cohesionWeight = 4f; 
-    [SerializeField] float wanderWeight = 1f; 
+    [SerializeField] float wanderWeight = 1f;
+    [SerializeField] float containmentWeight = 1f; 
 
-    [Header("Wander")]
-    [SerializeField] float wanderRadius = 0.3f;
+    [Header("Wander")] 
+    [SerializeField] float wanderRadius = 0.3f; // size of the wander circle, higher value means fish meanders more 
     [SerializeField] float wanderDistance = 0.1f;
-    [SerializeField] float wanderJitter = 20f;
-    float wanderAngle; // ??? this versus maxTurnForce
+    [SerializeField] float wanderJitter = 20f; // how rapidly wanderAngle changes, ie. how often fish picks new direction
+    float wanderAngle; // current angle of the wander target around the wander circle
 
     [Header("Wander Debug")]
     [SerializeField] bool drawGizmos = false;
@@ -74,37 +75,34 @@ public class FishAgent : MonoBehaviour
         Vector3 alignment = Alignment();
         Vector3 cohesion = Cohesion();
         Vector3 wander = Wander();
+        Vector3 containment = tank.GetContainmentSteering(localPosition);
+
 
         // Sum up the behavior results, considering their weights
         steering += separation * separationWeight;
         steering += alignment * alignmentWeight;
         steering += cohesion * cohesionWeight;
         steering += wander * wanderWeight;
+        steering += containment * containmentWeight;
 
-        steering = Vector3.ClampMagnitude(steering, maxTurnForce);  // ???
+        // limit the maximum heading change per frame to avoid abrupt turns
+        steering = Vector3.ClampMagnitude(steering, maxTurnForce); 
     
-        // Separate direction from speed
+        // Separate direction from speed through normalization
         // Steering only changes direction, and not magnitude
+        // If the vector is nearly 0, then keep moving in whatever direction the fish is currently facing
         localVelocity += steering * dt;
         localVelocity = localVelocity.sqrMagnitude > 0.0001f
             ? localVelocity.normalized
-            : transform.localRotation * Vector3.forward; // ???
+            : transform.localRotation * Vector3.forward;
 
         UpdateSpeed(dt);
+
+        // Apply speed to a normalized velocity
         localPosition += localVelocity * currentSpeed * dt;
-
-        // Ensure fish stays inside the tank this frame
-        ContainInsideTank();
-
+        
+        // Move the fish
         transform.localPosition = localPosition;
-
-        // Spins ???
-        // Vector3 worldVelocity =
-        //     tank.transform.TransformDirection(localVelocity);
-        // transform.rotation = Quaternion.LookRotation(
-        //     worldVelocity,
-        //     tank.transform.up
-        // );
 
         // Control orientation without spinning
         Vector3 localDir = localVelocity.normalized;
@@ -156,54 +154,6 @@ public class FishAgent : MonoBehaviour
             speedMatchRate * dt
         );
 
-    }
-
-
-    void ContainInsideTank()
-    {
-        Vector3 half = tank.tankSize * 0.5f;
-
-        Vector3 target = localPosition;
-        bool outside = false;
-
-        if (localPosition.x > half.x - wallBuffer)
-        {
-            target.x = half.x - 1f;
-            outside = true;
-        }
-        else if (localPosition.x < -half.x + wallBuffer)
-        {
-            target.x = -half.x + 1f;
-            outside = true;
-        }
-
-        if (localPosition.y > half.y) // no buffer, allow jumping out of water
-        {
-            target.y = half.y - 1f;
-            outside = true;
-        }
-        else if (localPosition.y < -half.y + wallBuffer)
-        {
-            target.y = -half.y + 1f;
-            outside = true;
-        }
-
-        if (localPosition.z > half.z - wallBuffer)
-        {
-            target.z = half.z - 1f;
-            outside = true;
-        }
-        else if (localPosition.z < -half.z + wallBuffer)
-        {
-            target.z = -half.z + 1f;
-            outside = true;
-        }
-
-        if (outside)
-        {
-            localVelocity += Seek(target) * Time.deltaTime * 5f;
-            localVelocity = localVelocity.normalized;
-        }
     }
 
     Vector3 Separation()
@@ -326,6 +276,10 @@ public class FishAgent : MonoBehaviour
     }
 
  
+    ////////////////////////////////////////
+    // Debug drawing
+    ////////////////////////////////////////
+    
     void OnDrawGizmos()
     {
         if (!drawGizmos || tank == null)
@@ -333,8 +287,6 @@ public class FishAgent : MonoBehaviour
 
         if (localVelocity.sqrMagnitude < 0.001f)
             return;
-
-        Quaternion rotation = transform.localRotation * pitchNode.localRotation;
 
         // Convert local-space debug points into world space
         Vector3 worldCircleCenter = tank.transform.TransformPoint(debugCircleCenter);
@@ -394,3 +346,5 @@ public class FishAgent : MonoBehaviour
         }
     }
 }
+
+// MY CODE END

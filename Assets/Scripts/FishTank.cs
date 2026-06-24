@@ -1,3 +1,5 @@
+// MY CODE START
+
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -8,7 +10,7 @@ public class FishTank : MonoBehaviour
     [SerializeField] private Transform visualTank;
     [Header("Aquarium parameters")]
     [SerializeField] private int fishCount = 20;
-    //[SerializeField] private float wallBuffer = 0.2f;
+    [SerializeField] private float wallBuffer = 0.2f;
 
     public Vector3 tankSize => visualTank.localScale;
 
@@ -33,50 +35,52 @@ public class FishTank : MonoBehaviour
         }
     }
 
-    // public Vector3 GetContainmentSteering(Vector3 localPosition)
-    // {
-    //     Vector3 half = tankSize * 0.5f;
+    public Vector3 GetContainmentSteering(Vector3 localPosition)
+    {
+        Vector3 half = tankSize * 0.5f;
 
-    //     Vector3 target = localPosition;
-    //     bool outside = false;
+        Vector3 target = localPosition;
+        bool outside = false;
 
-    //     if (localPosition.x > half.x - wallBuffer)
-    //     {
-    //         target.x = half.x - 1f;
-    //         outside = true;
-    //     }
-    //     else if (localPosition.x < -half.x + wallBuffer)
-    //     {
-    //         target.x = -half.x + 1f;
-    //         outside = true;
-    //     }
+        if (localPosition.x > half.x - wallBuffer)
+        {
+            target.x = half.x - 1f;
+            outside = true;
+        }
+        else if (localPosition.x < -half.x + wallBuffer)
+        {
+            target.x = -half.x + 1f;
+            outside = true;
+        }
 
-    //     if (localPosition.y > half.y)
-    //     {
-    //         target.y = half.y - 1f;
-    //         outside = true;
-    //     }
-    //     else if (localPosition.y < -half.y + wallBuffer)
-    //     {
-    //         target.y = -half.y + 1f;
-    //         outside = true;
-    //     }
+        if (localPosition.y > half.y)
+        {
+            target.y = half.y - 1f;
+            outside = true;
+        }
+        else if (localPosition.y < -half.y + wallBuffer)
+        {
+            target.y = -half.y + 1f;
+            outside = true;
+        }
 
-    //     if (localPosition.z > half.z - wallBuffer)
-    //     {
-    //         target.z = half.z - 1f;
-    //         outside = true;
-    //     }
-    //     else if (localPosition.z < -half.z + wallBuffer)
-    //     {
-    //         target.z = -half.z + 1f;
-    //         outside = true;
-    //     }
+        if (localPosition.z > half.z - wallBuffer)
+        {
+            target.z = half.z - 1f;
+            outside = true;
+        }
+        else if (localPosition.z < -half.z + wallBuffer)
+        {
+            target.z = -half.z + 1f;
+            outside = true;
+        }
 
-    //     if (!outside)
-    //         return Vector3.zero;
+        if (!outside)
+            return Vector3.zero;
 
-    //     return (target - localPosition).normalized;
-    // }
+        return (target - localPosition).normalized;
+    }
 
 }
+
+// MY CODE END
