@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {   
     [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float rotateSensitivity = 5f;
+    [SerializeField] private float rotateSensitivity = 1f;
     
     private float yaw;
     private float pitch;
